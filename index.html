@@ -19,17 +19,39 @@
     <div class="content">
         <div class="sidebar">
             <div class="actions">
-                <button>Create New Player</button>
-                <button>Play Against AI</button>
-                <button>Start Game</button>
-                <button>Reset</button>
+                <button class="newplayer">Create New Player</button>
+                    <dialog>
+                        <form id="playercreation">
+                            <label for="name">Name:</label>
+                            <input id="name" name="name" type="text"/>
+
+                            <label for="sign">Sign:</label>
+                            <input id="sign" name="sign" type="radio"/>
+                            
+                            <div class="buttons">
+                                <button class="createplayer">Submit</button>
+                                <button class="cancel" formmethod="dialog">Cancel</button>
+                            </div>
+                        </form>
+                    </dialog>
+                <button class="AI">Play Against AI</button>
+                <button class="start">Start Game</button>
+                <button class="reset">Reset</button>
             </div>
             <div class="scoreboard">
 
             </div>
         </div>
-        <div class="board">
-            
+        <div class="gameboard">
+            <div class="1"></div>
+            <div class="2"></div>
+            <div class="3"></div>
+            <div class="4"></div>
+            <div class="5"></div>
+            <div class="6"></div>
+            <div class="7"></div>
+            <div class="8"></div>
+            <div class="9"></div>
         </div>
     </div>
 </body>
