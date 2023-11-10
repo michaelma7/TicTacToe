@@ -20,13 +20,16 @@
         <div class="sidebar">
             <div class="actions">
                 <button class="newplayer">Create New Player</button>
-                    <dialog>
+                    <dialog class="creationdialog">
                         <form id="playercreation">
                             <label for="name">Name:</label>
                             <input id="name" name="name" type="text"/>
 
-                            <label for="sign">Sign:</label>
-                            <input id="sign" name="sign" type="radio"/>
+                            <p>Sign:</p>
+                            <input id="X" name="sign" type="radio" value="X" checked/>
+                            <label for="X">X</label>
+                            <input id="O" name="sign" type="radio" value="O"/>
+                            <label for="O">O</label>
                             
                             <div class="buttons">
                                 <button class="createplayer">Submit</button>
@@ -39,20 +42,23 @@
                 <button class="reset">Reset</button>
             </div>
             <div class="scoreboard">
-
             </div>
         </div>
         <div class="gameboard">
-            <div class="1"></div>
-            <div class="2"></div>
-            <div class="3"></div>
-            <div class="4"></div>
-            <div class="5"></div>
-            <div class="6"></div>
-            <div class="7"></div>
-            <div class="8"></div>
-            <div class="9"></div>
+            <div class="one"></div>
+            <div class="two"></div>
+            <div class="three"></div>
+            <div class="four"></div>
+            <div class="five"></div>
+            <div class="six"></div>
+            <div class="seven"></div>
+            <div class="eight"></div>
+            <div class="nine "></div>
         </div>
+        <div class="result"></div>
+        <dialog class="onemore">
+            <button class="playagain">Play Again?</button>
+        </dialog>
     </div>
 </body>
 <script src="tictactoe.js"></script>
