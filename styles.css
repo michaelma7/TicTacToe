@@ -9,16 +9,124 @@ body{
     font-family: Roboto, Arial, Helvetica, sans-serif;
 }
 
-.gameboard {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr;
-    row-gap: 2px;
-    column-gap: 2px;
-    background-color: black;
+a {
+    text-decoration: none;
+    color: black;
+    font-size: 14px;
+    font-weight: bold;
 }
 
-.gameboard * {
-    height: 75px;
-    background-color: white;
+dialog {
+    z-index: 2;
+    position: absolute;
+}
+
+.header, .about, .content, .gameboard>*, .sidebar, .scoreboard {
+    display: flex;
+}
+
+.players, .gameboard {
+    display: grid;
+}
+
+.header {
+    background-color: rgb(240, 240, 240);
+    justify-content: space-between;
+    flex: 1;
+    padding: 15px;
+}
+
+.logo {
+    color: black;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(3px);
+    z-index: 1;
+}
+
+.hidden {
+    display: none;
+}
+
+.about {
+    gap: 15px;
+}
+
+.content {
+    flex-direction: column;
+    height: 80vh;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.sidebar {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.actions>button, .playagain, .createplayer, .finished, .cancel {
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    padding: 10px 15px;
+    color: white;
+    font-size: 12px;
+}
+
+.scoreboard {
+    flex-direction: column;
+    gap: 10px;
+    font-size: 18px;
+}
+
+.players {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 10px;
+}
+
+.turn-order {
+    grid-column: 1 / span 2;
+}
+
+.gameboard {
+    grid-template-columns: 100px 100px 100px;
+    grid-template-rows: 100px 100px 100px;
+    row-gap: 5px;
+    column-gap: 5px;
+    background-color: rgb(255, 255, 255);
+}
+
+.gameboard>* {
+    background-color: rgb(233, 233, 233);
+    border-radius: 10px;
+    font-size: 80px;
+    justify-content: center;
+    align-items: center;
 } 
+
+.actions>button {
+    background-color: gray;
+}
+
+.playagain, .createplayer {
+    background-color: rgb(42, 138, 42);
+}
+
+.finished, .cancel {
+    background-color: red;
+}
+
