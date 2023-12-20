@@ -2,24 +2,13 @@
 const boardController = (function() {
     //cache DOM
     const gameboard = document.querySelector('.gameboard');
-    const nodes = gameboard.childNodes;
+    const nodes = gameboard.children;
     const squareArray = Array.from(nodes); //es6 only
     const turnOrder = document.querySelector('.player-turn');
 
-    //event listeners how to make this activate only once game has started. have it called via game start?
-    squareArray.forEach(place => place.addEventListener('click', (e) => {boardMove(turnOrder.lastChild.innerHTML, e.target); turnControl();}));
+    //event listeners
+    squareArray.forEach(place => place.addEventListener('click', (e) => boardMove(turnOrder.lastChild.innerHTML, e.target)));
     
-    //other variables
-    let playerTurn = '';
-    const seed = Math.floor(Math.random()*2);
-    if(seed<1){
-        //player one goes first
-        playerTurn = true;
-    } else {
-        //player two goes first
-        playerTurn = false; 
-    };
-
     //gameboard variables and creation
     let board = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
     let winningCombos = {};
@@ -37,46 +26,87 @@ const boardController = (function() {
     };
 
     function checkWin(sign) {
-        //check for tie. loop through all children on gameboard to check if they have children
+        //check for tie. loop through and check for empty squares
+        let i = 0;
         for(let div in squareArray) {
-            if(!div.hasChildNodes()) {
-                continue;
+            if(!squareArray[div].hasChildNodes()) {
+                break
+            } else if(i===8){
+                won(sign);
+                gameController.render('tie');
+                return
             } else {
-                return "Tie";
+                i++;
             };
         };
+        won(sign);
+        function won(sign) {
+            //map position of selected sign
+            let signMap = board.map((position) => position === sign);
             
-        //map position of selected sign
-        let signMap = board.map((position) => position === sign);
-        //check each winning condition vs current state 
-        for(let combo in winningCombos) {
-            let condition = winningCombos[combo];
-            let line = [];
-            for(let location of condition) {
-              line.push(signMap[location]);
-            };
-            if(!line.includes(false)){
-                //push to game controller to render winning player
-                gameController.render(playerName);
-            };
-        };        
+            //check each winning condition vs current state 
+            for(let combo in winningCombos) {
+                let condition = winningCombos[combo];
+                let line = [];
+                for(let location of condition) {
+                line.push(signMap[location]);
+                };
+                if(!line.includes(false)){
+                    //push to game controller to render winning player
+                    gameController.render(sign);
+                };
+            }; 
+        };           
     };
 
     function boardMove(sign, position) {
         //check for game start and empty square
-        if(!gameController.startStatus) {
-            return "Game has not started!";
+        if(!gameController.checkGameStart()) {
+            errorController.errorMsg('gamestart');
         } else if (position.innerHTML !== '') {
-            return "Position has been filled!";
+            errorController.errorMsg('filled');
         } else {
             for(let k=0; k< board.length; k++) {
-                if(board[k] === position.class) {
+                if(board[k] === position.className) {
                     board[k] = sign;
                 };
             };
             render(sign, position);
             checkWin(sign);
+            turnController.turnControl();
         };
+    };
+
+    function boardReset() {
+        //find each div with a child and remove child
+        for(let place in squareArray) {
+            if(squareArray[place].hasChildNodes()) {
+                let child = squareArray[place].firstChild;
+                squareArray[place].removeChild(child);
+            } else {
+                continue
+            };
+        };
+        board = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+    };
+
+    return {boardMove, boardReset};
+})();
+
+const turnController = (function() {
+    const turnOrder = document.querySelector('.player-turn');
+    let playerTurn = '';
+
+    function firstMove() {
+        let seed = Math.floor(Math.random()*2);
+        if(seed<1){
+            //player one goes first
+            playerTurn = true;
+        } else {
+            //player two goes first
+            playerTurn = false; 
+        };
+        turnControl();
     };
 
     function turnControl() {
@@ -88,7 +118,49 @@ const boardController = (function() {
         playerTurn = !playerTurn;
     };
 
-    return {boardMove, checkWin, turnControl};
+    return {turnControl, firstMove};
+})();
+
+const errorController = (function () {
+    //DOM cache
+    const errorModal = document.querySelector('.errordialog');
+    const closeModal = document.querySelector('.modal-close');
+    const overlay = document.querySelector('.overlay');
+    const errorMessage = document.querySelector('.errormessage');
+
+    //eventlisteners
+    closeModal.addEventListener('click', (e) => {errorModal.close(); overlay.classList.add('hidden');});
+
+    function errorMsg(error) {
+        let msg = '';
+        switch(error){
+            case 'players':
+                msg = 'Not enough players. Please make two players or play with the computer!';
+                errorMessage.innerHTML = msg;
+                errorModal.showModal();
+                overlay.classList.remove('hidden');
+                break;
+            case 'gamestart':
+                msg = 'The game has not started yet! Please start the game.';
+                errorMessage.innerHTML = msg;
+                errorModal.showModal();
+                overlay.classList.remove('hidden');
+                break;
+            case 'filled':
+                msg = 'This space has already been filled. Please select an empty square.';
+                errorMessage.innerHTML = msg;
+                errorModal.showModal();
+                overlay.classList.remove('hidden');
+                break;
+            default:
+                msg = 'Something went wrong. Whoops!';
+                errorMessage.innerHTML = msg;
+                errorModal.showModal();
+                overlay.classList.remove('hidden');
+        }
+    };
+
+    return {errorMsg};
 })();
 
 const playerController = (function() {
@@ -101,13 +173,15 @@ const playerController = (function() {
     const create = document.querySelector('.createplayer');
     const playerOne = document.querySelector('.playerone');
     const playerTwo = document.querySelector('.playertwo');
+    const overlay = document.querySelector('.overlay');
 
     //event listeners
-    addNew.addEventListener('click', (e) => modal.showModal());
+    addNew.addEventListener('click', (e) => {modal.showModal(); overlay.classList.remove('hidden');});
     create.addEventListener('click', (e) => {
                                                 e.preventDefault();
                                                 createPlayer(playerName.value , document.querySelector('input[name=sign]:checked').value);
                                                 modal.close();
+                                                overlay.classList.add('hidden');
                                             });
                                     
     function render(name, sign) {
@@ -116,11 +190,11 @@ const playerController = (function() {
             //create div with name
             let player = document.createElement("span");
             player.className = `${name}`;
-            player.innerHTML = "Name: " + `${name}`;
+            player.innerHTML = name;
             //create div with sign
             let symbol = document.createElement('div');
             symbol.className = `${sign}`;
-            symbol.innerHTML = "Sign: " + `${sign}`;
+            symbol.innerHTML = sign;
             playerOne.appendChild(player);
             playerOne.appendChild(symbol);
         //player two check and add
@@ -130,7 +204,7 @@ const playerController = (function() {
             player2.innerHTML = name;
             let symbol2 = document.createElement('div');
             symbol2.className = `${sign}`;
-            symbol2.innerHTML = 'Sign: ' +`${sign}`;
+            symbol2.innerHTML = sign;
             playerTwo.appendChild(player2);
             playerTwo.appendChild(symbol2);
         } else {
@@ -148,18 +222,14 @@ const playerController = (function() {
         return { name, sign, wins, getWins, won };
     };
 
-    function deletePlayer(name) {
+    function deletePlayer(playerDiv) {
         //find player and delete
-        let player = document.querySelector(`${name}`);
-        player.removeChild(player.firstChild());
-        player.removeChild(player.firstChild());
+        let player = playerDiv.parentNode;
+        player.removeChild(player.firstChild);
+        player.removeChild(player.firstChild);
     };
 
-    function winningPlayer() {
-
-    };
-
-    return {createPlayer, deletePlayer, winningPlayer, playerOne, playerTwo};
+    return {createPlayer, deletePlayer, playerOne, playerTwo};
 })();
 
 const gameController = (function(){
@@ -167,41 +237,63 @@ const gameController = (function(){
     const reset = document.querySelector('.reset');
     const start = document.querySelector('.start');
     const AI = document.querySelector('.AI');
-    const startModal = document.querySelector('.startdialog');
-    const overlay = document.querySelector('.overlay');
-    const closeModal = document.querySelector('.modal-close');
-    const gameStart = document.querySelector('.modal-submit');
+    const resultModal = document.querySelector('.onemore');
+    const winMessage = document.querySelector('.winningmsg');
+    const playAgain = document.querySelector('.playagain');
 
     //eventlisteners
     reset.addEventListener('click', (e) => restart());
     start.addEventListener('click', (e) => startGame());
     AI.addEventListener('click', (e) => playComputer());
-    closeModal.addEventListener('click', (e) => startModal.close());
-    gameStart.addEventListener('click', (e) => {e.preventDefault(); boardController.turnControl(); startModal.close();});
+    playAgain.addEventListener('click', (e) => {resultModal.close(); boardController.boardReset(); startGame();});
 
     //other variables
     let startStatus = false;
 
     function startGame() {
-
+        //if game is started already do nothing
+        if(startStatus){
+            return
+        };
         //check that there are two players
-        if(!playerController.playerTwo.hasChildNodes || !playerController.playerOne.hasChildNodes) {
-            return console.log("Not enough players");
+        if(!playerController.playerTwo.hasChildNodes() || !playerController.playerOne.hasChildNodes()) {
+            errorController.errorMsg('players');
+            return
         } else {
             startStatus = true;
+            //push to turn order function
+            turnController.firstMove();
         };
-        //open modal to confirm game start
-        startModal.showModal();
-        //push to turn order function
     };
+
+    function checkGameStart() {
+        if(!startStatus){
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
 
     function restart() {
         window.location.reload();
     };
 
-    function render(name) {
+    //move this to another module to not expose render to js injection?
+    function render(sign) {
         startStatus = false;
-        return `${name}` + " Wins!";
+        if(sign==='tie'){
+            let msg = 'Tie!';
+            winMessage.innerHTML = msg;
+            resultModal.showModal(); 
+        } else {
+            let signDiv = document.querySelector('.'+`${sign}`);
+            let nameDiv = signDiv.parentNode.firstChild;
+            let name = nameDiv.className;
+            let msg = `${name}` + " Wins!";
+            winMessage.innerHTML = msg;
+            resultModal.showModal(); 
+        };
     };
 
     function playComputer() {
@@ -211,7 +303,7 @@ const gameController = (function(){
         startGame();
     };
 
-    return {startStatus, restart};
+    return {checkGameStart, render};
 })();
 
 
