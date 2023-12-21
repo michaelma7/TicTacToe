@@ -7,7 +7,7 @@ const boardController = (function() {
     const turnOrder = document.querySelector('.player-turn');
 
     //event listeners
-    squareArray.forEach(place => place.addEventListener('click', (e) => boardMove(turnOrder.lastChild.innerHTML, e.target)));
+    squareArray.forEach(place => place.addEventListener('click', (e) => boardMove(turnOrder.innerHTML, e.target)));
     
     //gameboard variables and creation
     let board = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
@@ -32,14 +32,18 @@ const boardController = (function() {
             if(!squareArray[div].hasChildNodes()) {
                 break
             } else if(i===8){
-                won(sign);
-                gameController.render('tie');
-                return
+                let tie = won(sign);
+                if(tie) {
+                    break;
+                } else {
+                    gameController.render('tie');
+                };
             } else {
                 i++;
             };
         };
         won(sign);
+
         function won(sign) {
             //map position of selected sign
             let signMap = board.map((position) => position === sign);
@@ -54,8 +58,13 @@ const boardController = (function() {
                 if(!line.includes(false)){
                     //push to game controller to render winning player
                     gameController.render(sign);
+                    //if all spots are filled but someone wins properly show winner
+                    return true;
+                } else {
+                    continue
                 };
-            }; 
+            };
+             
         };           
     };
 
@@ -111,9 +120,9 @@ const turnController = (function() {
 
     function turnControl() {
         if(playerTurn) {
-            turnOrder.innerHTML = playerController.playerOne.innerHTML;
+            turnOrder.innerHTML = playerController.playerOne.lastChild.innerHTML;
         } else {
-            turnOrder.innerHTML = playerController.playerTwo.innerHTML;
+            turnOrder.innerHTML = playerController.playerTwo.lastChild.innerHTML;
         };
         playerTurn = !playerTurn;
     };
@@ -129,7 +138,7 @@ const errorController = (function () {
     const errorMessage = document.querySelector('.errormessage');
 
     //eventlisteners
-    closeModal.addEventListener('click', (e) => {errorModal.close(); overlay.classList.add('hidden');});
+    closeModal.addEventListener('click', (e) => {errorModal.classList.add('hidden'); overlay.classList.add('hidden');});
 
     function errorMsg(error) {
         let msg = '';
@@ -137,25 +146,25 @@ const errorController = (function () {
             case 'players':
                 msg = 'Not enough players. Please make two players or play with the computer!';
                 errorMessage.innerHTML = msg;
-                errorModal.showModal();
+                errorModal.classList.remove('hidden');
                 overlay.classList.remove('hidden');
                 break;
             case 'gamestart':
                 msg = 'The game has not started yet! Please start the game.';
                 errorMessage.innerHTML = msg;
-                errorModal.showModal();
+                errorModal.classList.remove('hidden');
                 overlay.classList.remove('hidden');
                 break;
             case 'filled':
                 msg = 'This space has already been filled. Please select an empty square.';
                 errorMessage.innerHTML = msg;
-                errorModal.showModal();
+                errorModal.classList.remove('hidden');
                 overlay.classList.remove('hidden');
                 break;
             default:
                 msg = 'Something went wrong. Whoops!';
                 errorMessage.innerHTML = msg;
-                errorModal.showModal();
+                errorModal.classList.remove('hidden');
                 overlay.classList.remove('hidden');
         }
     };
@@ -176,11 +185,11 @@ const playerController = (function() {
     const overlay = document.querySelector('.overlay');
 
     //event listeners
-    addNew.addEventListener('click', (e) => {modal.showModal(); overlay.classList.remove('hidden');});
+    addNew.addEventListener('click', (e) => {overlay.classList.remove('hidden'); modal.classList.remove('hidden');});
     create.addEventListener('click', (e) => {
                                                 e.preventDefault();
                                                 createPlayer(playerName.value , document.querySelector('input[name=sign]:checked').value);
-                                                modal.close();
+                                                modal.classList.add('hidden');
                                                 overlay.classList.add('hidden');
                                             });
                                     
@@ -192,7 +201,7 @@ const playerController = (function() {
             player.className = `${name}`;
             player.innerHTML = name;
             //create div with sign
-            let symbol = document.createElement('div');
+            let symbol = document.createElement('span');
             symbol.className = `${sign}`;
             symbol.innerHTML = sign;
             playerOne.appendChild(player);
@@ -202,7 +211,7 @@ const playerController = (function() {
             let player2 = document.createElement("span");
             player2.className = `${name}`;
             player2.innerHTML = name;
-            let symbol2 = document.createElement('div');
+            let symbol2 = document.createElement('span');
             symbol2.className = `${sign}`;
             symbol2.innerHTML = sign;
             playerTwo.appendChild(player2);
@@ -236,16 +245,22 @@ const gameController = (function(){
     //DOM cache
     const reset = document.querySelector('.reset');
     const start = document.querySelector('.start');
-    const AI = document.querySelector('.AI');
+    // const AI = document.querySelector('.AI');
     const resultModal = document.querySelector('.onemore');
     const winMessage = document.querySelector('.winningmsg');
     const playAgain = document.querySelector('.playagain');
+    const overlay = document.querySelector('.overlay');
 
     //eventlisteners
     reset.addEventListener('click', (e) => restart());
     start.addEventListener('click', (e) => startGame());
-    AI.addEventListener('click', (e) => playComputer());
-    playAgain.addEventListener('click', (e) => {resultModal.close(); boardController.boardReset(); startGame();});
+    // AI.addEventListener('click', (e) => playComputer());
+    playAgain.addEventListener('click', (e) => {
+                                                    resultModal.classList.add('hidden'); 
+                                                    boardController.boardReset();
+                                                    overlay.classList.add('hidden'); 
+                                                    startGame(); 
+                                                });
 
     //other variables
     let startStatus = false;
@@ -285,14 +300,16 @@ const gameController = (function(){
         if(sign==='tie'){
             let msg = 'Tie!';
             winMessage.innerHTML = msg;
-            resultModal.showModal(); 
+            overlay.classList.remove('hidden');
+            resultModal.classList.remove('hidden'); 
         } else {
             let signDiv = document.querySelector('.'+`${sign}`);
             let nameDiv = signDiv.parentNode.firstChild;
             let name = nameDiv.className;
             let msg = `${name}` + " Wins!";
             winMessage.innerHTML = msg;
-            resultModal.showModal(); 
+            overlay.classList.remove('hidden');
+            resultModal.classList.remove('hidden'); 
         };
     };
 
@@ -304,6 +321,12 @@ const gameController = (function(){
     };
 
     return {checkGameStart, render};
+})();
+
+const AIController = (function() {
+    function computerAction() {
+
+    };
 })();
 
 

@@ -18,15 +18,31 @@ a {
 
 dialog {
     z-index: 2;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    width: 350px;
+    padding: 10px;
+    min-height: 150px;
     position: absolute;
+    top: 50lvh;
+    left: 50lvw;
+    transform: translate(-50%, -150%);
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 15px;
 }
 
-.header, .about, .content, .gameboard>*, .sidebar, .scoreboard {
+dialog, .header, .about, .content, .gameboard>*, .sidebar, .scoreboard, #playercreation, .buttons, .actions, .playerone, .playertwo {
     display: flex;
 }
 
-.players, .gameboard {
+.players, .gameboard, .turn-order, .sign {
     display: grid;
+}
+
+.content, .sidebar, #playercreation, .scoreboard, dialog{
+    flex-direction: column;
 }
 
 .header {
@@ -64,17 +80,64 @@ dialog {
 }
 
 .content {
-    flex-direction: column;
+    position: relative;
     height: 80vh;
     align-items: center;
     justify-content: space-around;
 }
 
+.errordiv {
+    font-size: 18px;
+    margin-left: 10px;
+}
+
+.modal-close {
+    position: absolute;
+    right: 3%;
+    top: 7%;
+    background-color: rgb(255, 255, 255);
+    border-radius: 30px;
+    border: none;
+    height: 30px;
+    width: 30px;
+}
+
+.modal-close:hover {
+    background-color: rgb(226, 226, 226);
+}
+
 .sidebar {
-    flex-direction: column;
-    justify-content: center;
     align-items: center;
     gap: 20px;
+}
+
+.actions {
+    gap: 10px;
+}
+
+#playercreation {
+    gap: 15px;
+}
+
+input {
+    padding: 3px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid black;
+}
+
+.sign {
+    grid-template-columns: 1fr 2fr;
+    grid-template-rows: 1fr;
+}
+
+.buttons {
+    gap: 30px;
+    justify-content: center;
+}
+
+#O {
+    margin-left: 20px;
 }
 
 .actions>button, .playagain, .createplayer, .finished, .cancel {
@@ -88,7 +151,7 @@ dialog {
 
 .scoreboard {
     flex-direction: column;
-    gap: 10px;
+    gap: 15px;
     font-size: 18px;
 }
 
@@ -98,8 +161,23 @@ dialog {
     gap: 10px;
 }
 
+.players > * {
+    font-size: 18px;
+}
+
+.playerone, .playertwo {
+    gap: 10px;
+}
+
 .turn-order {
     grid-column: 1 / span 2;
+    grid-template-columns: 1fr 1fr;
+    background-color: rgb(145, 145, 145);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 20px;
 }
 
 .gameboard {
