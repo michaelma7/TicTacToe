@@ -6,6 +6,21 @@ const boardController = (function() {
     const squareArray = Array.from(nodes); //es6 only
     const turnOrder = document.querySelector('.player-turn');
 
+    //once function
+    function once(callback) {
+        let notCalled = true;
+        let output;
+        function callbackOnce(...args) {
+          if(notCalled) {
+            notCalled = false;
+            output = callback(...args);
+          }
+            return output
+        }
+        return callbackOnce
+    }
+
+    const placeSign = once(boardMove(sign, place));
     //event listeners
     squareArray.forEach(place => place.addEventListener('click', (e) => boardMove(turnOrder.innerHTML, e.target)));
     
